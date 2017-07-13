@@ -40,17 +40,26 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
  
-public class CSE304 {
+public class CSE304SQLInsert {
   public static void main(String[] args) throws JSONException, IOException {
-                int countdown=1;
               
+                String connectionUrl = "jdbc:sqlserver://localhost:1433;" +
+			"databaseName=master;integratedSecurity=true;";
+                        
 		// Declare the JDBC objects.
 		Connection con = null;
 		Statement stmt = null;
 		ResultSet rs = null;
-                
+                try{
+                    Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+            		con = DriverManager.getConnection(connectionUrl);
+                        stmt = con.createStatement();
+                }
+                catch (Exception e) {
+			e.printStackTrace();
+		}
       
-	  ArangoDB arangoDB = new ArangoDB.Builder().user("root").password("hr").build();
+	 // ArangoDB arangoDB = new ArangoDB.Builder().user("root").password("hr").build();
 	  String logtitle="";
           String contributor_name="";
 	  String action="";
@@ -61,27 +70,13 @@ public class CSE304 {
           String timestamp="";
           
 	  
-	  String dbName = "database";
-	  try {
-	    arangoDB.createDatabase(dbName);
-	    System.out.println("Database created: " + dbName);
-	  } catch (ArangoDBException e) {
-	    System.err.println("Failed to create database: " + dbName + "; " + e.getMessage());
-	  }
-	  
-	  String collectionName = "wikiPageLog";
-	  try {
-	    CollectionEntity myArangoCollection = arangoDB.db("database").createCollection(collectionName);
-	    System.out.println("Collection created: " + myArangoCollection.getName());
-	  } catch (ArangoDBException e) {
-	    System.err.println("Failed to create collection: " + collectionName + "; " + e.getMessage());
-	  } 
+	
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       
       try {
           DocumentBuilder builder = factory.newDocumentBuilder();
-          for(int loger=79;loger<600;loger++){
+          for(int loger=489;loger<600;loger++){
           try {
               
               org.w3c.dom.Document doc = builder.parse("D:\\xml dataset\\enwiki-20170620-pages-logging-"+Integer.toString(loger)+".xml");
@@ -92,7 +87,7 @@ public class CSE304 {
                   Node p = itemList.item(i);
                   Element noD=(Element)p;
                   NodeList noDs=noD.getChildNodes();
-                  BaseDocument myObject = new BaseDocument();
+                //  BaseDocument myObject = new BaseDocument();
                   
                  for(int j=0; j<noDs.getLength(); j++)
                       {
@@ -118,15 +113,16 @@ public class CSE304 {
                                     noder=conL.item(1);
                                     name=(Element)noder;
                                     if(name.getTextContent()!=null){
-                                        myObject.addAttribute("contributor_name",name.getTextContent());
+                                      //  myObject.addAttribute("contributor_name",name.getTextContent());
                                         contributor_name=name.getTextContent();
+                                        contributor_name=contributor_name.replace("'", " ");
                                         contributor_name=contributor_name.trim();
                                     }}
                                     if(conL.item(3)!=null){
                                     noder=conL.item(3);
                                     name=(Element)noder;
                                     if(name.getTextContent()!=null){
-                                        myObject.addAttribute("contributor_id",name.getTextContent());
+                                     //   myObject.addAttribute("contributor_id",name.getTextContent());
                                         contributor_id=Integer.parseInt(name.getTextContent());
                                     }}
                                     ////////////////////////////////////////////////////////////////////////////////
@@ -155,24 +151,7 @@ public class CSE304 {
                           {
                         
                                     Element name = (Element)n;
-                                    if(j==0){
-                                        String sTemp=name.getTextContent();
-                                        sTemp=sTemp.replace("'", " ");
-                                        myObject.addAttribute(name.getTagName(), sTemp);
-                                        myObject.setKey(sTemp);
-                                    }
-                                    else{
-                                        String sTemp=name.getTextContent();
-                                        sTemp=sTemp.replace("'", " ");
-                                        if(name.getTagName().equals("timestamp")){
-                                            sTemp=sTemp.replace('T', ' ');
-                                            sTemp=sTemp.replace('Z',' ');
-                                            sTemp.trim();
-                                        }
-                                        myObject.addAttribute(name.getTagName(),sTemp);
-                                        
-                               //         System.out.println("inserted into arango"+ name.getTagName()+" "+ name.getTextContent());
-                                    }
+                                   
                                     if(name.getTagName().equals("id")) id=Integer.parseInt(name.getTextContent());
                                     else if(name.getTagName().equals("comment")) comment=name.getTextContent();
                                     else if(name.getTagName().equals("type")) type=name.getTextContent();
@@ -182,48 +161,71 @@ public class CSE304 {
                                    
                           }
                           
-                                   
+                                    timestamp=timestamp.replace('T',' ');
+                                    timestamp=timestamp.replace('Z',' ');
+                                    comment=comment.replace("'", " ");
+                                    comment=comment.trim();
+                                    type=type.trim();
+                                    action=action.trim();
+                                    logtitle=logtitle.replace("'"," ");
+                                    logtitle=logtitle.trim();
+                                    timestamp=timestamp.trim();
                       }
                  
                  ///////////////eikhane sql e insert er code gula jabe :3 :3 
-                    try {
+                  /*  try {
                         arangoDB.db(dbName).collection(collectionName).insertDocument(myObject);
-                        System.out.println("Document inserted into collection ");
-                        countdown++;
-                        System.out.println(countdown);
+                        System.out.println("Document created");
                     } catch (ArangoDBException e) {
                         System.err.println("Failed to create document. " + e.getMessage());
                     }
+                    */
+                    try {
+        		// Establish the connection.
+        		
+                        
+            		// Create and execute an SQL statement that returns some data.
+            	//	String SQL = "SELECT * FROM dbo.spt_monitor";
+                       
+                        String sql = "INSERT INTO wikiPageLog " +
+                   "VALUES ("+Integer.toString(id)+", '"+logtitle+"', '"+action+"', '"+type+"', '"+comment+"', '"+timestamp+"', '"+contributor_name+"', "+Integer.toString(contributor_id)+")";
+                     //   sql.replace("'", "''");
+            	/*	PreparedStatement prep = con.prepareStatement("INSERT INTO Ww VALUES(?, ?, ?, ?, ?, ?, ?, ?)");
+prep.setInt(1, id);
+prep.setString(2, logtitle);
+prep.setString(3, action);
+prep.setString(4, type);
+prep.setString(5, comment);
+prep.setString(6, timestamp);
+prep.setString(7,contributor_name);
+prep.setInt(8, contributor_id);
+prep.executeUpdate(); */
+                     
                     
+                     stmt.executeUpdate(sql);
+                     System.out.println("inserted into sql server "); 
+                    
+                     System.out.println(id);
+        	}
+        
+		// Handle any errors that may have occurred.
+		catch (Exception e) {
+			e.printStackTrace();
+		}
                  
               }
               
           } catch (SAXException ex) {
-              Logger.getLogger(CSE304.class.getName()).log(Level.SEVERE, null, ex);
+              Logger.getLogger(CSE304arangoInsert.class.getName()).log(Level.SEVERE, null, ex);
           } catch (IOException ex) {
-              Logger.getLogger(CSE304.class.getName()).log(Level.SEVERE, null, ex);
+              Logger.getLogger(CSE304arangoInsert.class.getName()).log(Level.SEVERE, null, ex);
           }
           }
            
          
       } catch (ParserConfigurationException ex) {
-          Logger.getLogger(CSE304.class.getName()).log(Level.SEVERE, null, ex);
-      }
-
-          
-          
-        //  JSONObject jsonObject = JSONML.toJSONObject(string);
-       //   System.out.println(jsonObject.toString());
-          
-         /*
-          ArangoDB arango = new ArangoDB.Builder().build();
-          ArangoCollection collection=arango.db("database").collection("fCollection");
-          DocumentCreateEntity<String> entity = collection.insertDocument(
-                jsonObject.toString());
-          String key = entity.getKey();
-          
-          String rawJsonString = collection.getDocument(key, String.class);
-        //  String xml = JSONML.toString(rawJsonString);
-          System.out.println(rawJsonString); */
+          Logger.getLogger(CSE304arangoInsert.class.getName()).log(Level.SEVERE, null, ex);
+      }       
+         
   }
 }

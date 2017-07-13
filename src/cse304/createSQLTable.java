@@ -33,7 +33,7 @@ import java.sql.*;
 import java.sql.ResultSet;
 import java.util.Scanner;
 
-public class connectURL {
+public class createSQLTable {
 
 	public static void main(String[] args) {
 		
