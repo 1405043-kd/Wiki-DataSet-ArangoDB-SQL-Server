@@ -1,9 +1,10 @@
 # Wiki-DataSet-ArangoDB-SQL-Server
 # 1405042-1405043
 
-________________________________________________
+Splitted the enwiki-20170620-pages-logging.xml dataset
+_______________________________________________
 
-First parsed a wiki xml dataset 
+Parsed splitted files iteratively
 ________________________________________________
 
 Inserted the dataset into ArangoDB and SQL Server separtely
@@ -13,3 +14,6 @@ Executed several queries separtely on both database
 
 _________________________________________________
 
+Measured time taken by the program for each query 
+
+_______________________________________________
