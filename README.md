@@ -4,7 +4,7 @@
 Splitted the enwiki-20170620-pages-logging.xml dataset
 _______________________________________________
 
-Parsed splitted files iteratively
+Parsed splitted files iteratively using DOM Parser
 ________________________________________________
 
 Inserted the dataset into ArangoDB and SQL Server separtely
